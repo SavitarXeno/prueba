@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Científico Auto.sav</title>
+    <style>
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://images4.alphacoders.com/134/1344767.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            opacity: 0.94; /* Ajustar la opacidad para hacer el fondo más oscuro */
+        }
+        
+        .calculator {
+            background-color: #333;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+            width: 700px;
+            text-align: center;
+            position: relative; /* Para el posicionamiento del número en segundo plano */
+        }
+        
+        .screen {
+            width: calc(100% - 20px);
+            margin-bottom: 20px;
+            padding: 10px;
+            text-align: right;
+            font-size: 24px;
+            border: none;
+            border-radius: 10px;
+            background-color: #1a1a1a;
+            color: #fff;
+            outline: none;
+            position: relative; /* Para el posicionamiento del número en segundo plano */
+        }
+
+        .previous-number {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 12px;
+            opacity: 0.5;
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .button {
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            outline: none;
+            background-color: #4d4d4d;
+            color: #fff;
+            transition: background-color 0.3s ease;
+        }
+        
+        .button:hover {
+            background-color: #666;
+        }
+        
+        .button.operator {
+            background-color: #ff9800;
+            color: #fff;
+        }
+        
+        .button.operator:hover {
+            background-color: #f57c00;
+        }
+        
+        .sidebar {
+            background-color: #333;
+            color: #fff;
+            width: 300px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            right: 0;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .guide-sidebar {
+            background-color: #333;
+            color: #fff;
+            width: 300px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .history-item {
+            margin-bottom: 10px;
+        }
+        
+        .popup {
+            display: none;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        
+        .popup-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+                /* Estilos del botón "Volver a Proyectos" */
+                .return-button {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: #FF0000;
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            padding: 10px 20px;
+            font-size: 16px;
+            text-decoration: none;
+            z-index: 999; /* Asegura que esté por encima de otros elementos */
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5); /* Efecto de sombra */
+        }
+
+        .return-button:hover {
+            background-color: #FF3333; /* Cambio de color al pasar el ratón */
+        }
+
+        .return-button:active {
+            transform: translateY(2px); /* Efecto de clic */
+        }
+    </style>
+</head>
+<body>
+  <div class="calculator">
+    <h1>Científico Auto.sav</h1>
+    <input type="text" id="screen" class="screen" readonly>
+    <div class="previous-number" id="previousNumber"></div> <!-- Número en segundo plano -->
+    <div class="buttons">
+        <button class="button" onclick="appendToScreen('7')">7</button>
+        <button class="button" onclick="appendToScreen('8')">8</button>
+        <button class="button" onclick="appendToScreen('9')">9</button>
+        <button class="button operator" onclick="appendToScreen('/')">/</button>
+        <button class="button" onclick="appendToScreen('(')">(</button>
+        <button class="button" onclick="appendToScreen('4')">4</button>
+        <button class="button" onclick="appendToScreen('5')">5</button>
+        <button class="button" onclick="appendToScreen('6')">6</button>
+        <button class="button operator" onclick="appendToScreen('*')">*</button>
+        <button class="button" onclick="appendToScreen(')')">)</button>
+        <button class="button" onclick="appendToScreen('1')">1</button>
+        <button class="button" onclick="appendToScreen('2')">2</button>
+        <button class="button" onclick="appendToScreen('3')">3</button>
+        <button class="button operator" onclick="appendToScreen('-')">-</button>
+        <button class="button" onclick="appendToScreen('.')">.</button>
+        <button class="button" onclick="appendToScreen('0')">0</button>
+        <button class="button" onclick="clearScreen()">C</button>
+        <button class="button operator" onclick="calculate()">=</button>
+        <button class="button operator" onclick="appendToScreen('+')">+</button>
+        <button class="button" onclick="backspace()">←</button>
+        <button class="button" onclick="reset()">Reset</button>
+        <button class="button" onclick="copyResult()">Copy</button>
+        <button class="button" onclick="togglePopup()">Opciones Avanzadas</button>
+    </div>
+</div>
+
+<div class="sidebar">
+    <h2>Historial</h2>
+    <div id="history" class="history"></div>
+</div>
+
+<div class="guide-sidebar">
+    <h2>Guía de Operaciones</h2>
+    <p id="operationGuide"></p>
+</div>
+
+<div class="popup-overlay" onclick="togglePopup()"></div>
+
+<div class="popup" id="popup">
+    <span class="popup-close" onclick="togglePopup()">X</span>
+    <h2>Opciones Avanzadas</h2>
+    <ul>
+        <li><button class="button" onclick="advancedOperation('Newton')">Newton</button></li>
+        <li><button class="button" onclick="advancedOperation('Aceleración')">Aceleración</button></li>
+        <li><button class="button" onclick="advancedOperation('Masa')">Masa</button></li>
+        <li><button class="button" onclick="advancedOperation('Área Triángulo')">Área Triángulo</button></li>
+        <li><button class="button" onclick="advancedOperation('Área Cuadrado')">Área Cuadrado</button></li>
+        <li><button class="button" onclick="advancedOperation('Área Rectángulo')">Área Rectángulo</button></li>
+        <li><button class="button" onclick="advancedOperation('Volumen Cubo')">Volumen Cubo</button></li>
+        <li><button class="button" onclick="advancedOperation('Volumen Esfera')">Volumen Esfera</button></li>
+        <li><button class="button" onclick="advancedOperation('Hipotenusa Triángulo')">Hipotenusa Triángulo</button></li>
+        <li><button class="button" onclick="advancedOperation('Energía Cinética')">Energía Cinética</button></li>
+        <li><button class="button" onclick="advancedOperation('Temperatura')">Temperatura</button></li>
+        <li><button class="button" onclick="advancedOperation('Distancia')">Distancia</button></li>
+        <li><button class="button" onclick="advancedOperation('Velocidad')">Velocidad</button></li>
+        <li><button class="button" onclick="advancedOperation('Número Aleatorio')">Número Aleatorio</button></li>
+        <!-- Agregar más operaciones avanzadas -->
+    </ul>
+</div>
+
+<a href="proyectos.html" class="return-button">
+    Volver a Proyectos
+</a>
+
+<script>
+    let currentNumber = ''; // Variable para almacenar el número actual
+    let previousNumber = ''; // Variable para almacenar el número anterior
+    
+    function appendToScreen(value) {
+        let currentValue = document.getElementById('screen').value;
+        if (!isNaN(value) || value === '.') {
+            currentNumber += value;
+            document.getElementById('screen').value = currentValue + value;
+        } else if (value === '+' || value === '-' || value === '*' || value === '/') {
+            previousNumber = currentNumber;
+            currentNumber = '';
+            document.getElementById('screen').value = currentValue + value;
+            document.getElementById('previousNumber').textContent = previousNumber;
+        } else {
+            document.getElementById('screen').value += value;
+        }
+    }
+
+    function clearScreen() {
+        document.getElementById('screen').value = '';
+        currentNumber = '';
+        previousNumber = '';
+        document.getElementById('previousNumber').textContent = '';
+    }
+
+    function calculate() {
+        try {
+            let expression = document.getElementById('screen').value;
+            let result = eval(expression);
+            document.getElementById('screen').value = result.toLocaleString();
+            addToHistory(expression + " = " + result.toLocaleString());
+            showOperationGuide(expression);
+        } catch (error) {
+            alert('Invalid expression');
+        }
+    }
+
+    function backspace() {
+        let currentValue = document.getElementById('screen').value;
+        document.getElementById('screen').value = currentValue.slice(0, -1);
+    }
+
+    function reset() {
+        clearScreen();
+        document.getElementById('history').innerHTML = '';
+    }
+
+    function addToHistory(entry) {
+        let historyItem = document.createElement('div');
+        historyItem.textContent = entry;
+        historyItem.classList.add('history-item');
+        document.getElementById('history').appendChild(historyItem);
+    }
+
+    function copyResult() {
+        let result = document.getElementById('screen').value;
+        navigator.clipboard.writeText(result).then(function() {
+            alert('Resultado copiado al portapapeles: ' + result);
+        }, function() {
+            alert('No se pudo copiar el resultado.');
+        });
+    }
+
+    function togglePopup() {
+        let popup = document.getElementById('popup');
+        let overlay = document.querySelector('.popup-overlay');
+        if (popup.style.display === 'block') {
+            popup.style.display = 'none';
+            overlay.style.display = 'none';
+        } else {
+            popup.style.display = 'block';
+            overlay.style.display = 'block';
+        }
+    }
+
+    function advancedOperation(operation) {
+        switch(operation) {
+            case 'Newton':
+                let acceleration = prompt("Ingrese la aceleración (m/s^2):");
+                let mass = prompt("Ingrese la masa (kg):");
+                let newtonResult = acceleration * mass;
+                document.getElementById('screen').value = newtonResult.toLocaleString();
+                addToHistory("Fuerza (Newton) = " + newtonResult.toLocaleString());
+                showOperationGuide("Fuerza (Newton) = m * a");
+                break;
+            case 'Aceleración':
+                let velocity = prompt("Ingrese la velocidad (m/s):");
+                let time = prompt("Ingrese el tiempo (s):");
+                let accelerationResult = velocity / time;
+                document.getElementById('screen').value = accelerationResult.toLocaleString();
+                addToHistory("Aceleración = " + accelerationResult.toLocaleString() + " m/s^2");
+                showOperationGuide("Aceleración = v / t");
+                break;
+            case 'Masa':
+                let force = prompt("Ingrese la fuerza (Newton):");
+                let acceleration2 = prompt("Ingrese la aceleración (m/s^2):");
+                let massResult = force / acceleration2;
+                document.getElementById('screen').value = massResult.toLocaleString();
+                addToHistory("Masa = " + massResult.toLocaleString() + " kg");
+                showOperationGuide("Masa = F / a");
+                break;
+            case 'Área Triángulo':
+                let base = prompt("Ingrese la base del triángulo:");
+                let height = prompt("Ingrese la altura del triángulo:");
+                let areaTriangleResult = 0.5 * base * height;
+                document.getElementById('screen').value = areaTriangleResult.toLocaleString();
+                addToHistory("Área del triángulo = " + areaTriangleResult.toLocaleString());
+                showOperationGuide("Área del triángulo = 0.5 * base * height");
+                break;
+            case 'Área Cuadrado':
+                let side = prompt("Ingrese el lado del cuadrado:");
+                let areaSquareResult = side * side;
+                document.getElementById('screen').value = areaSquareResult.toLocaleString();
+                addToHistory("Área del cuadrado = " + areaSquareResult.toLocaleString());
+                showOperationGuide("Área del cuadrado = lado * lado");
+                break;
+            case 'Área Rectángulo':
+                let length = prompt("Ingrese la longitud del rectángulo:");
+                let width = prompt("Ingrese la anchura del rectángulo:");
+                let areaRectangleResult = length * width;
+                document.getElementById('screen').value = areaRectangleResult.toLocaleString();
+                addToHistory("Área del rectángulo = " + areaRectangleResult.toLocaleString());
+                showOperationGuide("Área del rectángulo = longitud * anchura");
+                break;
+            case 'Volumen Cubo':
+                let side2 = prompt("Ingrese el lado del cubo:");
+                let volumeCubeResult = side2 ** 3;
+                document.getElementById('screen').value = volumeCubeResult.toLocaleString();
+                addToHistory("Volumen del cubo = " + volumeCubeResult.toLocaleString());
+                showOperationGuide("Volumen del cubo = lado^3");
+                break;
+            case 'Volumen Esfera':
+                let radius = prompt("Ingrese el radio de la esfera:");
+                let volumeSphereResult = (4/3) * Math.PI * radius ** 3;
+                document.getElementById('screen').value = volumeSphereResult.toLocaleString();
+                addToHistory("Volumen de la esfera = " + volumeSphereResult.toLocaleString());
+                showOperationGuide("Volumen de la esfera = (4/3) * π * radio^3");
+                break;
+            case 'Hipotenusa Triángulo':
+                let sideA = prompt("Ingrese la longitud del primer cateto:");
+                let sideB = prompt("Ingrese la longitud del segundo cateto:");
+                let hypotenuseResult = Math.sqrt(sideA ** 2 + sideB ** 2);
+                document.getElementById('screen').value = hypotenuseResult.toLocaleString();
+                addToHistory("Hipotenusa del triángulo = " + hypotenuseResult.toLocaleString());
+                showOperationGuide("Hipotenusa del triángulo = √(a^2 + b^2)");
+                break;
+            case 'Energía Cinética':
+                let mass2 = prompt("Ingrese la masa (kg):");
+                let velocity2 = prompt("Ingrese la velocidad (m/s):");
+                let kineticEnergyResult = 0.5 * mass2 * velocity2 ** 2;
+                document.getElementById('screen').value = kineticEnergyResult.toLocaleString();
+                addToHistory("Energía Cinética = " + kineticEnergyResult.toLocaleString() + " J");
+                showOperationGuide("Energía Cinética = 0.5 * m * v^2");
+                break;
+            case 'Temperatura':
+                let tempCelsius = prompt("Ingrese la temperatura en grados Celsius:");
+                let tempFahrenheit = (tempCelsius * 9/5) + 32;
+                document.getElementById('screen').value = tempFahrenheit.toLocaleString();
+                addToHistory("Temperatura en Fahrenheit = " + tempFahrenheit.toLocaleString() + " °F");
+                showOperationGuide("Convertir de Celsius a Fahrenheit: °F = (°C * 9/5) + 32");
+                break;
+            case 'Distancia':
+                let speed = prompt("Ingrese la velocidad (m/s):");
+                let time2 = prompt("Ingrese el tiempo (s):");
+                let distanceResult = speed * time2;
+                document.getElementById('screen').value = distanceResult.toLocaleString();
+                addToHistory("Distancia = " + distanceResult.toLocaleString() + " m");
+                showOperationGuide("Distancia = velocidad * tiempo");
+                break;
+            case 'Velocidad':
+                let distance = prompt("Ingrese la distancia (m):");
+                let time3 = prompt("Ingrese el tiempo (s):");
+                let velocityResult = distance / time3;
+                document.getElementById('screen').value = velocityResult.toLocaleString();
+                addToHistory("Velocidad = " + velocityResult.toLocaleString() + " m/s");
+                showOperationGuide("Velocidad = distancia / tiempo");
+                break;
+            case 'Número Aleatorio':
+                let min = parseInt(prompt("Ingrese el valor mínimo:"));
+                let max = parseInt(prompt("Ingrese el valor máximo:"));
+                let randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+                document.getElementById('screen').value = randomNumber.toLocaleString();
+                addToHistory("Número Aleatorio = " + randomNumber.toLocaleString());
+                showOperationGuide("Número Aleatorio entre " + min + " y " + max);
+                break;
+            // Agregar más operaciones avanzadas
+        }
+        togglePopup();
+    }
+
+    function showOperationGuide(operation) {
+        document.getElementById('operationGuide').textContent = operation;
+    }
+
+    // Listen for keyboard events
+    document.addEventListener('keydown', function(event) {
+        const key = event.key;
+        if (!isNaN(key) || key === '.' || key === '+' || key === '-' || key === '*' || key === '/' || key === '(' || key === ')' || key === '%') {
+            appendToScreen(key);
+        } else if (key === 'Enter') {
+            calculate();
+        } else if (key === 'Backspace') {
+            backspace();
+        }
+    });
+</script>
+
+</body>
+</html>

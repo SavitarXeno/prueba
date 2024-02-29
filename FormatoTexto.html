@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <title>Creador de Biblias - Savitar</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #ff0000;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      overflow: hidden;
+    }
+    .particles {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px), radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+      background-size: 5px 5px;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    textarea {
+      width: 90%;
+      height: 600px;
+      color: #ffffff;
+      background-color: rgba(0, 0, 0, 0.8);
+      border: 2px solid #ff0000;
+      resize: none;
+      padding: 20px;
+      font-size: 18px;
+      border-radius: 30px;
+    }
+    .bubble {
+      background-color: #ff0000;
+      color: #ffffff;
+      padding: 10px 20px;
+      border-radius: 50px;
+      margin: 10px auto;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    #contador {
+      font-size: 16px;
+      margin-bottom: 5px;
+    }
+    #botones {
+      margin-top: 20px;
+      display: flex;
+    }
+    .button {
+      background-color: #ff0000;
+      color: #ffffff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s, color 0.3s;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    .button:hover {
+      background-color: #c70000;
+      color: #ffffff;
+    }
+    .options-container {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      border-radius: 20px;
+      z-index: 9999;
+      backdrop-filter: blur(10px);
+      opacity: 0.9;
+    }
+    .options-container button {
+      background-color: #ff0000;
+      color: #ffffff;
+      padding: 10px 20px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+      display: block;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    .options-container button:hover {
+      background-color: #c70000;
+    }
+    .options-container button:last-child {
+      margin-bottom: 0;
+    }
+    .options-container .confirmation-bubble {
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="particles"></div>
+  <div class="container">
+    <div class="bubble">Editor de texto</div>
+    <textarea id="texto" placeholder="Escribe tu texto aquí"></textarea>
+    <div id="botones">
+      <button class="button" onclick="showOptions('themes')">Temas</button>
+      <button class="button" onclick="toggleView()">Vista Celular</button>
+      <button class="button" onclick="showConfirmation('Copy Bibles')">Crear biblias</button>
+      <button class="button" onclick="togglePrefixes()">Activar/Desactivar Prefijos</button>
+      <button class="button" onclick="copyParagraphs()" style="display: none;">Copiar todos los párrafos</button>
+      <button class="button" onclick="showOptions('clean-spelling')">Limpiar Ortografía</button>
+    </div>
+    <div class="bubble">Contador: <span id="contador">0</span></div>
+    <div class="options-container" id="themes-container">
+      <button onclick="changeTheme('rojo')">Rojo</button>
+      <button onclick="changeTheme('azul')">Azul</button>
+      <button onclick="changeTheme('verde')">Verde</button>
+      <button onclick="changeTheme('rosa')">Rosa</button>
+      <button onclick="changeTheme('violeta')">Violeta</button>
+      <button onclick="changeTheme('amarillo')">Amarillo</button>
+    </div>
+    <div class="options-container" id="confirmation-container" style="display: none;">
+      <div class="confirmation-bubble">¿Deseas copiar todas las biblias?</div>
+      <button onclick="showOptions('copy-bible', 'Biblia 1')">Biblia 1</button>
+      <button onclick="showOptions('copy-bible', 'Biblia 2')">Biblia 2</button>
+      <button onclick="showOptions('copy-bible', 'Biblia 3')">Biblia 3</button>
+      <button onclick="hideOptions()">Cancelar</button>
+    </div>
+    <div class="options-container" id="copy-bible-container" style="display: none;">
+      <div class="confirmation-bubble">Elige el párrafo a copiar</div>
+      <button onclick="copyBibleParagraph(1)">Párrafo 1</button>
+      <button onclick="copyBibleParagraph(2)">Párrafo 2</button>
+      <button onclick="copyBibleParagraph(3)">Párrafo 3</button>
+      <button onclick="hideOptions()">Cancelar</button>
+    </div>
+    <div class="options-container" id="clean-spelling-container" style="display: none;">
+      <div class="confirmation-bubble">¿Estás seguro? Después de hacerlo, se modificarán varias palabras que podrían significar un cambio crítico en el texto en caso de interpretar las palabras deseadas, pues será realizado por una IA y no por ti.</div>
+      <button onclick="cleanSpelling()">Limpiar Ortografía</button>
+      <button onclick="hideOptions()">Cancelar</button>
+    </div>
+  </div>
+
+  <script>
+    let currentTheme = 'rojo';
+    const textArea = document.getElementById('texto');
+    const characterCounter = document.getElementById('contador');
+    let askPrefixes = true;
+    let mobileView = false;
+    let confirmCopy = false;
+    let optionsCopy = false;
+
+    textArea.addEventListener('input', () => {
+      const text = textArea.value;
+      const characters = text.length;
+      characterCounter.innerText = characters;
+    });
+
+    function splitText() {
+      const maxCharacters = 1900;
+      const text = textArea.value;
+      const paragraphs = text.match(new RegExp(`.{1,${maxCharacters}}`, 'g'));
+      if (paragraphs) {
+        textArea.value = paragraphs.join('\n\n\n');
+      }
+    }
+
+    function togglePrefixes() {
+      askPrefixes = !askPrefixes;
+      const btnText = askPrefixes ? 'Activar Prefijos' : 'Desactivar Prefijos';
+      document.getElementById('togglePrefixBtn').innerText = btnText;
+      const prefixContainer = document.getElementById('prefix-container');
+      prefixContainer.style.display = askPrefixes ? 'block' : 'none';
+    }
+
+    function addPrefix(prefix) {
+      textArea.value += `${prefix} `;
+      const prefixContainer = document.getElementById('prefix-container');
+      prefixContainer.style.display = 'none';
+    }
+
+    function showOptions(type, bible) {
+      optionsCopy = true;
+      confirmCopy = false;
+      const optionsContainer = document.getElementById(`${type}-container`);
+      optionsContainer.style.display = 'block';
+
+      if (type === 'copy-bible') {
+        copyParagraphs(bible);
+      }
+    }
+
+    function hideOptions() {
+      optionsCopy = false;
+      const optionsContainers = document.querySelectorAll('.options-container');
+      optionsContainers.forEach((container) => {
+        container.style.display = 'none';
+      });
+
+      document.getElementById('copy-paragraphs-btn').style.display = 'block';
+    }
+
+    function changeTheme(newTheme) {
+      document.body.style.backgroundColor = newTheme === 'rojo' ? '#000' : newTheme;
+      document.body.style.color = newTheme === 'rojo' ? '#ff0000' : '#ffffff';
+      currentTheme = newTheme;
+
+      const themeButtons = document.querySelectorAll('.button, .options-container button');
+      themeButtons.forEach((button) => {
+        button.style.backgroundColor = newTheme === 'rojo' ? '#ffffff' : '#ff0000';
+        button.style.color = newTheme === 'rojo' ? '#ff0000' : '#ffffff';
+      });
+    }
+
+    function toggleView() {
+      mobileView = !mobileView;
+      const isMobileView = document.body.classList.toggle('mobile-view');
+      const toggleViewBtn = document.getElementById('toggleViewBtn');
+      toggleViewBtn.innerText = isMobileView ? 'Vista Computadora' : 'Vista Celular';
+    }
+
+    textArea.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        if (askPrefixes) {
+          const acceptPrefixes = confirm('¿Deseas agregar un prefijo al inicio de este párrafo?');
+          if (acceptPrefixes) {
+            const prefixContainer = document.getElementById('prefix-container');
+            prefixContainer.style.display = 'block';
+          }
+        }
+        textArea.value += '\n';
+      }
+    });
+
+    function showConfirmationCopy() {
+      confirmCopy = true;
+      const confirmationContainer = document.getElementById('confirmation-container');
+      confirmationContainer.style.display = 'block';
+    }
+
+    function copyBibleParagraph(bible) {
+      if (bible) {
+        const text = textArea.value;
+        const paragraphs = text.split('\n\n\n');
+        textArea.value = paragraphs[bible - 1];
+        hideOptions();
+      } else {
+        const text = textArea.value;
+        const paragraphs = text.split('\n\n\n');
+        const copyBtn = document.createElement('button');
+        copyBtn.innerText = 'Copiar Todos';
+        copyBtn.classList.add('button');
+        copyBtn.onclick = () => {
+          navigator.clipboard.writeText(text);
+          alert('Todos los párrafos copiados al portapapeles');
+        };
+        document.getElementById('copy-paragraphs-btn').style.display = 'none';
+        textArea.value = paragraphs.join('\n\n\n\n');
+        textArea.parentElement.appendChild(copyBtn);
+      }
+    }
+
+    function cleanSpelling() {
+      alert('Ortografía limpiada');
+      hideOptions();
+    }
+
+    function copyText() {
+      const text = textArea.value;
+      navigator.clipboard.writeText(text);
+      alert('Texto copiado al portapapeles');
+    }
+
+    document.getElementById('toggleViewBtn').onclick = toggleView;
+    document.getElementById('togglePrefixBtn').onclick = togglePrefixes;
+    document.getElementById('copyBiblesBtn').onclick = showConfirmationCopy;
+    document.getElementById('cleanSpellingBtn').onclick = () => showOptions('clean-spelling');
+    document.getElementById('copyParagraphsBtn').onclick = copyBibleParagraph;
+    document.getElementById('copyTextBtn').onclick = copyText;
+
+    changeTheme(currentTheme);
+  </script>
+</body>
+</html>

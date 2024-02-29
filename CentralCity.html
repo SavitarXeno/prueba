@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RBC-EASY</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #111; /* Color de fondo oscuro */
+      background-image: url('https://www.hindustantimes.com/ht-img/img/2023/08/23/550x309/jjk_233_1692785385534_1692785424019.png');
+      background-size: cover;
+      background-position: center;
+      background-blend-mode: overlay; /* Mezcla con el color de fondo */
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      text-align: center;
+      margin-top: 20%;
+    }
+    h1 {
+      color: #FF0000;
+    }
+    .start-button {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #FF0000;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+    .start-button:hover {
+      background-color: #FF3333;
+    }
+    .contact-link {
+      font-size: 12px;
+      color: #999999;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    /* Estilos para la ventana emergente */
+    .contact-popup {
+      width: 300px;
+      padding: 20px;
+      background-color: black;
+      color: white;
+      border: 2px solid #FF0000;
+      border-radius: 10px;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 999;
+    }
+    .contact-popup h2 {
+      color: #FF0000;
+      margin-bottom: 15px;
+    }
+    .contact-info {
+      color: white;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .contact-info a {
+      color: #FF0000;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>RBC-EASY</h1>
+    <p>Autor: Savitar</p>
+    <a href="proyectos.html" class="start-button">Empezar</a>
+    <p class="contact-link" onclick="showContactInfo()">Contacto</p>
+  </div>
+
+  <script>
+    function showContactInfo() {
+      var contactInfo = "<div class='contact-popup'><h2>Contacto</h2><p class='contact-info'>Savitar es el creador de esta página. Puedes contactarlo en el siguiente correo: <a href='mailto:savitarxeno@gmail.com'>savitarxeno@gmail.com</a> o visitar su perfil en Amino: <a href='http://aminoapps.com/p/spnuik'>http://aminoapps.com/p/spnuik</a>, o su perfil de Instagram: <a href='https://instagram.com/j.losoya_?igshid=MzNINGNkZWQ4Mg'>https://instagram.com/j.losoya_?igshid=MzNINGNkZWQ4Mg</a>.</p></div>";
+      var contactPopup = window.open("", "Contacto", "width=350,height=250");
+      contactPopup.document.body.innerHTML = contactInfo;
+    }
+  </script>
+</body>
+</html>
